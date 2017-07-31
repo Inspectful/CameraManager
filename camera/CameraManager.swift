@@ -45,6 +45,9 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
     /// Property to determine if the manager should show the error for the user. If you want to show the errors yourself set this to false. If you want to add custom error UI set showErrorBlock property. Default value is false.
     open var showErrorsToUsers = false
     
+    /// Variable to get the present video orientation.
+    open var currentOrientation: AVCaptureVideoOrientation = .portrait
+    
     /// Property to determine if the manager should show the camera permission popup immediatly when it's needed or you want to show it manually. Default value is true. Be carful cause using the camera requires permission, if you set this value to false and don't ask manually you won't be able to use the camera.
     open var showAccessPermissionPopupAutomatically = true
     
@@ -825,13 +828,24 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
     fileprivate func _currentVideoOrientation() -> AVCaptureVideoOrientation {
         switch UIDevice.current.orientation {
         case .landscapeLeft:
+            currentOrientation = .landscapeRight
             return .landscapeRight
         case .landscapeRight:
+            currentOrientation = .landscapeLeft
             return .landscapeLeft
+        case .faceUp:
+            return currentOrientation
+        case .faceDown:
+            return currentOrientation
+        case .portraitUpsideDown:
+            currentOrientation = .portraitUpsideDown
+            return .portraitUpsideDown
         default:
+            currentOrientation = .portrait
             return .portrait
         }
     }
+    
     
     fileprivate func _canLoadCamera() -> Bool {
         let currentCameraState = _checkIfCameraIsAvailable()
